@@ -7,7 +7,7 @@
     user_name: serge2029
     group_name: devops
   vars_files:
-    - variables.yml
+    - variables.yml #  for package to install, can do vars: or vars_files
     
   tasks:
     - name: Check the time

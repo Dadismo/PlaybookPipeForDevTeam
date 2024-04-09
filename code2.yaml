@@ -9,7 +9,7 @@
      - name: Check number of cpu
        shell: nproc 
        register: nproc_output
-
+       
      - name: Display the output
        debug:
         var: nproc_output.stdout
