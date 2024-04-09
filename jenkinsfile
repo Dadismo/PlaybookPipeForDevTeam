@@ -1,0 +1,75 @@
+pipeline {
+    agent none
+    environment {
+        github_link = 'xxx' // paste github link
+        gh_repo_name ='xxx' // paste repo name
+        QA_PBS = 'abc,def,str' // list of QA PB to STASH, add or remove PBs if needed
+        DEV_PBS = 'FRE,ERT' // list of DEV PB to STASH, add or remove PBs if needed
+        PROD_PBS = 'gty,hty,lop' // list of DEV PB to STASH, add or remove PBs if needed
+
+    }
+    stages{
+        stage ('cloning repo & stashing files in gitnode') {
+            agent {
+                label 'gitnode'
+            }
+            step {
+                script {
+                    // cloning
+                    sh "git clone ${github_link}"
+                    
+                    // change directory
+                    dir ("${gh_repo_name}")
+                     // stash the QA PB
+                        stash(name: 'QAPB', includes: "${QA_PBS}") 
+                    // stash the Dev PB
+                        stash(name: 'DEPB', includes: "${DEV_PBS}") 
+                    // stash the PROD PB
+                        stash(name: 'PRODPB', includes: "${PROD_PBS}") 
+                }
+            }
+        }
+        stage('Unstash QAPB') {
+            agent {
+                label 'ansible_master1'
+            }
+            steps {
+                // Unstash the QAPB in ansible master 1
+                unstash(name: 'QAPB')
+                
+                // Move the unstashed files to a specific directory
+                dir('path/to/QAdirectory') {
+                    sh 'mv $WORKSPACE/* .'
+                }
+            }
+        }
+        stage('Unstash DEVPB') {
+            agent {
+                label 'ansible_master1'
+            }
+            steps {
+                // Unstash the DEVPB in ansible master 1
+                unstash(name: 'DEVPB')
+                
+                // Move the unstashed files to a specific directory
+                dir('path/to/DEVdirectory') {
+                    sh 'mv $WORKSPACE/* .'
+                }
+            }
+        }
+        stage('Unstash PRODPB') {
+            agent {
+                label 'ansible_master2'
+            }
+            steps {
+                // Unstash the PRODPB in ansible master 2, different from QA & DEV
+                unstash(name: 'PRODPB')
+                
+                // Move the unstashed files to a specific directory
+                dir('path/to/PRODdirectory') {
+                    sh 'mv $WORKSPACE/* .'
+                }
+            }
+        }
+    }
+}
