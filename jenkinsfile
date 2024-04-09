@@ -1,6 +1,6 @@
 pipeline {
     agent none
-    environment {
+    environment {  // double check the block before any push
         github_link = 'xxx' // paste github link
         gh_repo_name ='xxx' // paste repo name
         QA_PBS = 'abc,def,str' // list of QA PB to STASH, add or remove PBs if needed
