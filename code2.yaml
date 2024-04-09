@@ -1,13 +1,13 @@
 ---
 - hosts: db
-  become: yes
-  ignore_errors: yes
-  gather_facts: 1 
+  become: true
+  ignore_errors: true
+  gather_facts: true 
   vars: 
     color: red
   tasks: 
      - name: Check number of cpu
-       command: uptime 
+       shell: nproc 
        register: nproc_output
 
      - name: Display the output

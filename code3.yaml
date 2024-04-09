@@ -1,13 +1,12 @@
 ---
 - hosts: db 
-  become: yes
+  become: true
   gather_facts: false
   tasks:
      - name: Install packages
-       yum:
+       package:
          name: "{{ item }}"
          state: present
-#       with_items:
        loop:
          - curl
          - finger
