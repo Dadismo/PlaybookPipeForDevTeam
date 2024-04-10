@@ -1,0 +1,53 @@
+pipeline {
+    agent none
+    environment {  // double check the block before any push
+        github_link = 'xxx' // paste github link
+        gh_repo_name ='xxx' // paste repo name
+        PROD_PBS = 'abc.yml,def.yml' // list of PB to STASH, add or remove PBs if needed
+    }
+    stages{
+        stage ('cloning repo & stashing files in gitnode') {
+            agent {
+                label 'gitnode'
+            }
+            step {
+                script {
+                    // cloning
+                    sh "git clone -b main ${github_link}"
+                    
+                    // change directory
+                    dir ("${gh_repo_name}")
+
+                    // run some testing on the syntax of the code w/ yamllint
+                        sh 'yamllint .' 
+                    // stash the Dev PB
+                       // stash(name: 'DEPB', includes: "${DEV_PBS}") 
+                    // stash the QA PB
+                       // stash(name: 'QAPB', includes: "${QA_PBS}") 
+                    // stash the PROD PB
+                        stash(name: 'PRODPB', includes: "${PROD_PBS}") 
+                }
+            }
+        }
+post {
+    always {
+         // Archive the YAML linting results
+        archiveArtifacts artifacts: 'yamllint-results.txt'
+    }
+}    
+        stage('Unstash PRODPB') {
+            agent {
+                label 'ansible_master2'
+            }
+            steps {
+                // Unstash the PRODPB in ansible master 2, different from QA & DEV
+                unstash(name: 'PRODPB')
+                
+                // Move the unstashed files to a specific directory
+                dir('path/to/PRODdirectory') {
+                    sh 'mv $WORKSPACE/* .'
+                }
+            }
+        }
+    }
+}
