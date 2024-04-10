@@ -46,6 +46,7 @@ post {
                 // Move the unstashed files to a specific directory
                 dir('path/to/PRODdirectory') {
                     sh 'mv $WORKSPACE/* .'
+                    sh 'sudo chmod 444 .'
                 }
             }
         }

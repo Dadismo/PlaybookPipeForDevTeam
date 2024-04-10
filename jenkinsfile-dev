@@ -13,7 +13,7 @@ pipeline {
             step {
                 script {
                     // cloning
-                    sh "git clone -b Dev ${github_link}"
+                    sh "git clone -b dev ${github_link}"
                     
                     // change directory
                     dir ("${gh_repo_name}")
@@ -46,6 +46,7 @@ post {
                 // Move the unstashed files to a specific directory
                 dir('path/to/DEVdirectory') {
                     sh 'mv $WORKSPACE/* .'
+                    sh 'sudo chmod 444 .'
                 }
             }
         }

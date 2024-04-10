@@ -2,7 +2,7 @@ pipeline {
     agent none
     environment {  // double check the block before any push
         github_link = 'xxx' // paste github link
-        gh_repo_name ='xxx' // paste repo name
+        gh_repo_name ='xxx' // paste repo name 
         QA_PBS = 'abc.yml,def.yml' // list of PB to STASH, add or remove PBs if needed
     }
     stages{
@@ -46,6 +46,7 @@ post {
                 // Move the unstashed files to a specific directory
                 dir('path/to/QAdirectory') {
                     sh 'mv $WORKSPACE/* .'
+                    sh 'sudo chmod 444 .'
                 }
             }
         }
