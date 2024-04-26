@@ -1,0 +1,30 @@
+---
+- name: Pull image from ECR and run container
+  hosts: all
+  become: yes
+  gather_facts: no
+
+  vars_files:
+    - vars_ecr.yml
+
+  tasks:
+    - name: Log in to ECR
+      command: "aws ecr get-login-password --region {{ ecr_registry.split('.')[2] }} | docker login --username AWS --password-stdin {{ ecr_registry }}"
+      changed_when: false
+
+    - name: Pull image from ECR
+      docker_image:
+        name: "{{ ecr_registry }}/{{ ecr_image_name }}:{{ ecr_image_tag }}"
+        state: present
+
+    - name: Run container
+      docker_container:
+        name: "{{ container_name }}"
+        image: "{{ ecr_registry }}/{{ ecr_image_name }}:{{ ecr_image_tag }}"
+        state: started
+        restart_policy: always
+        ports:
+          - "{{ container_port }}:{{ container_port }}"
+      become_user: "{{ ssh_user }}"
+      when: inventory_hostname in groups['servers']
+      delegate_to: "{{ inventory_hostname }}"

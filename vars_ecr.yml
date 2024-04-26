@@ -1,0 +1,13 @@
+---
+ecr_registry: "123456789012.dkr.ecr.us-west-2.amazonaws.com"
+ecr_image_name: "my-container-image"
+ecr_image_tag: "latest"
+
+container_name: "my-container"
+container_port: "8080"
+
+ssh_user: "your_ssh_user"
+ssh_key: "/path/to/your/private_key.pem"
+servers:
+  - "server1.example.com"
+  - "server2.example.com"
