@@ -39,7 +39,7 @@ post {
             agent {
                 label 'ansible_master1'
             }
-            steps {
+            step {
                 // Unstash the DEVPB in ansible master 1
                 unstash(name: 'DEVPB')
                 
