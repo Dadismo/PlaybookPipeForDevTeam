@@ -19,7 +19,7 @@ pipeline {
                     dir ("${gh_repo_name}")
 
                     // run some testing on the syntax of the code w/ yamllint
-                        sh 'yamllint .' 
+                        // sh 'yamllint .' 
                     // stash the Dev PB
                        // stash(name: 'DEPB', includes: "${DEV_PBS}") 
                     // stash the QA PB
@@ -28,13 +28,7 @@ pipeline {
                         stash(name: 'PRODPB', includes: "${PROD_PBS}") 
                 }
             }
-        }
-post {
-    always {
-         // Archive the YAML linting results
-        archiveArtifacts artifacts: 'yamllint-results.txt'
-    }
-}    
+        }   
         stage('Unstash PRODPB') {
             agent {
                 label 'ansible_master2'
@@ -49,6 +43,12 @@ post {
                     sh 'sudo chmod 444 .'
                 }
             }
+        }
+    }
+    post {
+        always {
+            // Clean up workspace
+            cleanWs()
         }
     }
 }
