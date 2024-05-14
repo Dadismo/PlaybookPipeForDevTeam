@@ -6,11 +6,11 @@ pipeline {
         DEV_PBS = 'abc.yml,def.yml' // list of PB to STASH, add or remove PBs if needed
     }
     stages{
-        stage ('cloning repo, testing & stashing files in gitnode') {
+        stage ('cloning repo, testing & stashing files in gitnode') { // the reason we cloning is because we are using an agent to perform the  task and not the jenkins servers
             agent {
                 label 'gitnode'
             }
-            step {
+            steps {
                 script {
                     // cloning
                     sh "git clone -b dev ${github_link}"
@@ -29,17 +29,17 @@ pipeline {
                 }
             }
         }
-post {
-    always {
-         // Archive the YAML linting results
-        archiveArtifacts artifacts: 'yamllint-results.txt'
-    }
-}    
+    post {
+        always {
+            // Archive the YAML linting results
+            archiveArtifacts artifacts: 'yamllint-results.txt'
+        }
+    }    
         stage('Unstash DEVPB') {
             agent {
                 label 'ansible_master1'
             }
-            step {
+            steps {
                 // Unstash the DEVPB in ansible master 1
                 unstash(name: 'DEVPB')
                 
@@ -49,6 +49,12 @@ post {
                     sh 'sudo chmod 444 .'
                 }
             }
+        }
+    }
+    post {
+        always {
+            // Clean up workspace
+            cleanWs()
         }
     }
 }
